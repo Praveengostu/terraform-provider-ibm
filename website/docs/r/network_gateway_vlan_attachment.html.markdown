@@ -1,0 +1,51 @@
+---
+layout: "ibm"
+page_title: "IBM: network_gateway_vlan_attachment"
+sidebar_current: "docs-ibm-resource-network-gateway-vlan-attachment
+description: |-
+  Manages attach and detach of VLAN to Gateway.
+---
+
+# ibm\_network_gateway_vlan_attachment
+
+Provide a resource to attach VLAN to a network gateway. This allows attachments to be created and deleted.
+
+For additional details, see the [IBM Cloud Infrastructure (SoftLayer) API docs](http://sldn.softlayer.com/reference/services/SoftLayer_Network_Gateway_Vlan).
+
+## Example Usage
+
+```hcl
+resource "ibm_network_gateway" "gateway" {
+  name = "gateway"
+
+  members {
+    hostname             = "%s-0"
+    domain               = "terraformuat1.ibm.com"
+    datacenter           = "ams01"
+    network_speed        = 100
+    private_network_only = false
+    tcp_monitoring       = true
+    process_key_name     = "INTEL_SINGLE_XEON_1270_3_40_2"
+    os_key_name          = "OS_VYATTA_5600_5_X_UP_TO_1GBPS_SUBSCRIPTION_EDITION_64_BIT"
+    redundant_network    = false
+    disk_key_names       = ["HARD_DRIVE_2_00TB_SATA_II"]
+    public_bandwidth     = 20000
+    memory               = 4
+    ipv6_enabled         = true
+  }
+}
+
+resource "ibm_network_gateway_vlan_attachment" "gateway_vlan" {
+  gateway_id      = "${ibm_network_gateway.gateway.id}"
+  network_vlan_id = 645086
+}
+
+```
+
+## Argument Reference
+
+The following arguments are supported:
+
+* `gateway_id` - (Required, int) The ID of the network gateway.
+* `network_vlan_id` - (Required, int) The ID of the network VLAN to be associated.
+* `bypass` - (Optional, boolean) Default `true`. Indicates if the VLAN should be in bypass or routed modes.
