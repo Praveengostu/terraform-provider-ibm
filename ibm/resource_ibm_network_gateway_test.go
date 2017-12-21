@@ -187,9 +187,7 @@ resource "ibm_network_gateway" "terraform-acceptance-test-1" {
 				memory                 = 4
 				ipv6_enabled           = true
 		   }
-		   associated_vlans       = [{"network_vlan_id" = 645086,"bypass" = true},
-		   {"network_vlan_id" = 637374,"bypass" = true}]
-		  }
+		   }
 `, hostname)
 }
 
@@ -227,8 +225,6 @@ resource "ibm_network_gateway" "terraform-acceptance-test-1" {
 			memory                 = 4
 			ipv6_enabled           = true
 	   }
-		   associated_vlans       = [{"network_vlan_id" = 645086,"bypass" = true},
-		  						    {"network_vlan_id" = 637374,"bypass" = true}]
 		  }
 `, hostname, hostname)
 }
@@ -267,8 +263,6 @@ resource "ibm_network_gateway" "terraform-acceptance-test-1" {
 			memory                 = 8
 			ipv6_enabled           = true
 	   }
-		   associated_vlans       = [{"network_vlan_id" = 645086,"bypass" = true},
-		  						    {"network_vlan_id" = 637374,"bypass" = true}]
 		  }
 `, hostname, hostname)
 }
