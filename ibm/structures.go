@@ -273,6 +273,20 @@ func flattenProtocols(list []datatypes.Network_LBaaS_Listener) []map[string]inte
 	return result
 }
 
+func flattenZones(list []containerv1.WorkerPoolZoneResponse) []map[string]interface{} {
+	zones := make([]map[string]interface{}, len(list))
+	for i, zone := range list {
+		l := map[string]interface{}{
+			"zone":         zone.WorkerPoolZone.ID,
+			"private_vlan": zone.WorkerPoolZone.WorkerPoolZoneNetwork.PrivateVLAN,
+			"public_vlan":  zone.WorkerPoolZone.WorkerPoolZoneNetwork.PublicVLAN,
+			"worker_count": zone.WorkerCount,
+		}
+		zones[i] = l
+	}
+	return zones
+}
+
 func flattenVlans(list []containerv1.Vlan) []map[string]interface{} {
 	vlans := make([]map[string]interface{}, len(list))
 	for i, vlanR := range list {
@@ -297,6 +311,37 @@ func flattenVlans(list []containerv1.Vlan) []map[string]interface{} {
 		vlans[i] = l
 	}
 	return vlans
+}
+
+func flattenWorkerPools(list []containerv1.WorkerPoolResponse) []map[string]interface{} {
+	workerPools := make([]map[string]interface{}, len(list))
+	for i, workerPool := range list {
+		l := map[string]interface{}{
+			"id":            workerPool.ID,
+			"hardware":      workerPool.Isolation,
+			"name":          workerPool.Name,
+			"machine_type":  workerPool.MachineType,
+			"size_per_zone": workerPool.Size,
+			"state":         workerPool.State,
+			"kube_version":  workerPool.WorkerVersion,
+			"labels":        workerPool.Labels,
+		}
+		zones := workerPool.Zones
+		zonesConfig := make([]map[string]interface{}, len(zones))
+		for j, zone := range zones {
+			z := map[string]interface{}{
+				"zone":         zone.ID,
+				"private_vlan": zone.PrivateVLAN,
+				"public_vlan":  zone.PublicVLAN,
+				"worker_count": zone.WorkerCount,
+			}
+			zonesConfig[j] = z
+		}
+		l["zones"] = zonesConfig
+		workerPools[i] = l
+	}
+
+	return workerPools
 }
 
 func normalizeJSONString(jsonString interface{}) (string, error) {
@@ -694,7 +739,6 @@ func flattenHealthMonitors(list []datatypes.Network_LBaaS_Listener) []map[string
 			"timeout":     *i.DefaultPool.HealthMonitor.Timeout,
 			"monitor_id":  *i.DefaultPool.HealthMonitor.Uuid,
 		}
-
 		if i.DefaultPool.HealthMonitor.UrlPath != nil {
 			l["url_path"] = *i.DefaultPool.HealthMonitor.UrlPath
 		}

@@ -35,9 +35,7 @@ func TestAccIBMContainerCluster_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"ibm_container_cluster.testacc_cluster", "kube_version", kubeVersion),
 					resource.TestCheckResourceAttr(
-						"ibm_container_cluster.testacc_cluster", "workers.0.version", kubeVersion),
-					resource.TestCheckResourceAttr(
-						"ibm_container_cluster.testacc_cluster", "workers.1.version", kubeVersion),
+						"ibm_container_cluster.testacc_cluster", "worker_pools.#", "1"),
 				),
 			},
 			{
@@ -50,11 +48,9 @@ func TestAccIBMContainerCluster_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"ibm_container_cluster.testacc_cluster", "kube_version", kubeUpdateVersion),
 					resource.TestCheckResourceAttr(
-						"ibm_container_cluster.testacc_cluster", "workers.0.version", kubeUpdateVersion),
-					resource.TestCheckResourceAttr(
-						"ibm_container_cluster.testacc_cluster", "workers.1.version", kubeVersion),
-					resource.TestCheckResourceAttr(
 						"ibm_container_cluster.testacc_cluster", "is_trusted", "false"),
+					resource.TestCheckResourceAttr(
+						"ibm_container_cluster.testacc_cluster", "worker_pools.#", "1"),
 				),
 			},
 		},
@@ -127,6 +123,8 @@ func TestAccIBMContainerCluster_worker_count(t *testing.T) {
 						"ibm_container_cluster.testacc_cluster", "worker_num", "1"),
 					resource.TestCheckResourceAttr(
 						"ibm_container_cluster.testacc_cluster", "workers_info.#", "1"),
+					resource.TestCheckResourceAttr(
+						"ibm_container_cluster.testacc_cluster", "worker_pools.#", "1"),
 				),
 			},
 			{
@@ -138,6 +136,8 @@ func TestAccIBMContainerCluster_worker_count(t *testing.T) {
 						"ibm_container_cluster.testacc_cluster", "worker_num", "2"),
 					resource.TestCheckResourceAttr(
 						"ibm_container_cluster.testacc_cluster", "workers_info.#", "2"),
+					resource.TestCheckResourceAttr(
+						"ibm_container_cluster.testacc_cluster", "worker_pools.#", "1"),
 				),
 			},
 		},
@@ -391,11 +391,7 @@ resource "ibm_container_cluster" "testacc_cluster" {
 	space_guid = "${data.ibm_space.space.id}"
 	account_guid = "${data.ibm_account.acc.id}"
 
-  workers = [{
-    name = "worker1"
-  },{
-    name = "worker2"
-    }]
+  worker_num      = 2
 
   kube_version    = "%s"
   machine_type    = "%s"
@@ -466,11 +462,7 @@ resource "ibm_container_cluster" "testacc_cluster" {
 	space_guid = "${data.ibm_space.space.id}"
 	account_guid = "${data.ibm_account.acc.id}"
 
-  workers = [{
-    name = "worker1"
-  },{
-    name = "worker2"
-    }]
+  worker_num      = 2
 
   machine_type    = "%s"
   isolation       = "public"
@@ -557,11 +549,7 @@ resource "ibm_container_cluster" "testacc_cluster" {
 
   account_guid = "${data.ibm_account.acc.id}"
 
-  workers = [{
-    name = "worker1"
-  },{
-    name = "worker2"
-    }]
+  worker_num      = 2
 
   machine_type    = "%s"
   isolation       = "public"
@@ -596,11 +584,7 @@ resource "ibm_container_cluster" "testacc_cluster" {
 	space_guid = "${data.ibm_space.space.id}"
 	account_guid = "${data.ibm_account.acc.id}"
 
-  workers = [{
-    name = "worker1"
-  },{
-    name = "worker2"
-    }]
+  worker_num      = 2
 
   machine_type    = "%s"
   isolation       = "public"
@@ -635,12 +619,7 @@ resource "ibm_container_cluster" "testacc_cluster" {
 	space_guid = "${data.ibm_space.space.id}"
 	account_guid = "${data.ibm_account.acc.id}"
 
-  workers = [{
-    name = "worker1"
-    version = "%s"
-    },{
-    name = "worker2"
-    }]
+  worker_num      = 2
 
   kube_version    = "%s"
   machine_type    = "%s"
@@ -648,7 +627,7 @@ resource "ibm_container_cluster" "testacc_cluster" {
   public_vlan_id  = "%s"
   private_vlan_id = "%s"
   no_subnet		  = true
-}	`, cfOrganization, cfOrganization, cfSpace, clusterName, datacenter, kubeUpdateVersion, kubeUpdateVersion, machineType, publicVlanID, privateVlanID)
+}	`, cfOrganization, cfOrganization, cfSpace, clusterName, datacenter, kubeUpdateVersion, machineType, publicVlanID, privateVlanID)
 }
 
 func testAccCheckIBMContainerCluster_private_and_public_subnet(clusterName string) string {
@@ -675,9 +654,7 @@ resource "ibm_container_cluster" "testacc_cluster" {
 	space_guid = "${data.ibm_space.space.id}"
 	account_guid = "${data.ibm_account.acc.id}"
 
-  workers = [{
-    name = "worker1"
-  }]
+  worker_num      = 1
 
   machine_type    = "%s"
   isolation       = "public"
@@ -711,9 +688,7 @@ resource "ibm_container_cluster" "testacc_cluster" {
 	space_guid = "${data.ibm_space.space.id}"
 	account_guid = "${data.ibm_account.acc.id}"
 
-  workers = [{
-    name = "worker1"
-  }]
+  worker_num      = 1
 
   machine_type    = "%s"
   isolation       = "public"
@@ -748,9 +723,7 @@ resource "ibm_container_cluster" "testacc_cluster" {
 	space_guid = "${data.ibm_space.space.id}"
 	account_guid = "${data.ibm_account.acc.id}"
 
-  workers = [{
-    name = "worker1"
-  }]
+  worker_num      = 1
 
   machine_type    = "%s"
   isolation       = "public"
@@ -784,9 +757,7 @@ resource "ibm_container_cluster" "testacc_cluster" {
 	space_guid = "${data.ibm_space.space.id}"
 	account_guid = "${data.ibm_account.acc.id}"
 
-  workers = [{
-    name = "worker1"
-  }]
+  worker_num      = 1
 
   machine_type    = "%s"
   isolation       = "public"
