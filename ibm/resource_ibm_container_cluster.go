@@ -52,6 +52,7 @@ func resourceIBMContainerCluster() *schema.Resource {
 			"workers": {
 				Type:          schema.TypeList,
 				Optional:      true,
+				Deprecated:    "Use worker_num instead.",
 				ConflictsWith: []string{"worker_num"},
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
