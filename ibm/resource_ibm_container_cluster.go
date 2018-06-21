@@ -462,11 +462,22 @@ func resourceIBMContainerClusterRead(d *schema.ResourceData, meta interface{}) e
 		return err
 	}
 
+	defaultWorkerPool, err := workerPoolsAPI.GetWorkerPool(clusterID, "default")
+	if err != nil {
+		return err
+	}
+	zones := defaultWorkerPool.Zones
+	for _, zone := range zones {
+		if zone.ID == cls.DataCenter {
+			d.Set("worker_num", zone.WorkerCount)
+			break
+		}
+	}
+
 	d.Set("name", cls.Name)
 	d.Set("server_url", cls.ServerURL)
 	d.Set("ingress_hostname", cls.IngressHostname)
 	d.Set("ingress_secret", cls.IngressSecretName)
-	d.Set("worker_num", cls.WorkerCount)
 	d.Set("subnet_id", d.Get("subnet_id").(*schema.Set))
 	d.Set("workers_info", workers)
 	d.Set("kube_version", strings.Split(cls.MasterKubeVersion, "_")[0])
