@@ -28,10 +28,7 @@ resource "ibm_container_cluster" "testacc_cluster" {
   private_vlan_id = "vlan"
   subnet_id       = ["1154643"]
 
-  workers = [{
-    name = "worker1"
-    action = "add"
-  }]
+  workers = 1
 
   webhook = [{
     level = "Normal"
@@ -78,7 +75,8 @@ The following arguments are supported:
 * `org_guid` - (Optional, string) The GUID for the IBM Cloud organization associated with the cluster. You can retrieve the value from data source `ibm_org` or by running the `bx iam orgs --guid` command in the IBM Cloud CLI.
 * `space_guid` - (Optional, string) The GUID for the IBM Cloud space associated with the cluster. You can retrieve the value from data source `ibm_space` or by running the `bx iam space <space-name> --guid` command in the IBM Cloud CLI.
 * `account_guid` - (Required, string) The GUID for the IBM Cloud account associated with the cluster. You can retrieve the value from data source `ibm_account` or by running the `bx iam accounts` command in the IBM Cloud CLI.
-* `workers` - (Optional, array) The worker nodes that you want to add to the cluster. Nested `workers` blocks have the following structure:
+* `workers` - (Deprecated) The worker nodes that you want to add to the cluster.  Use `worker_num` instead. This will be removed in the future versions.
+Nested `workers` blocks have the following structure:
 	* `action` - valid actions are add, reboot and reload.
 	* `name` - Name of the worker.
 	* `version` - worker version.
@@ -112,3 +110,17 @@ The following attributes are exported:
 * `subnet_id` - The subnets attached to this cluster.
 * `workers` -  Exported attributes are:
 	* `id` - The id of the worker
+* `worker_pools` - Worker pools attached to the cluster
+  * `name` - The name of the worker pool.
+  * `machine_type` - The machine type of the worker node.
+  * `size_per_zone` - Number of workers per zone in this pool.
+  * `hardware` - The level of hardware isolation for your worker node.
+  * `id` - Worker pool id.
+  * `state` - Worker pool state.
+  * `kube_version` - The kubernetes version of the nodes.
+  * `labels` - Labels on all the workers in the worker pool.
+  * `zones` - List of zones attached to the worker_pool.
+    * `zone` - Zone name.
+    * `private_vlan` - The ID of the private VLAN.
+    * `public_vlan` - The ID of the public VLAN.
+    * `worker_count` - Number of workers attached to this zone.
