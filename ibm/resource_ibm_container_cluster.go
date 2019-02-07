@@ -219,6 +219,20 @@ func resourceIBMContainerCluster() *schema.Resource {
 				ForceNew: true,
 				Default:  false,
 			},
+
+			"public_service_endpoint_enabled": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				ForceNew: true,
+				Default:  false,
+			},
+
+			"private_service_endpoint_enabled": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				ForceNew: true,
+				Default:  false,
+			},
 			"server_url": {
 				Type:     schema.TypeString,
 				Computed: true,
@@ -414,6 +428,8 @@ func resourceIBMContainerClusterCreate(d *schema.ResourceData, meta interface{})
 	enableTrusted := d.Get("is_trusted").(bool)
 	diskEncryption := d.Get("disk_encryption").(bool)
 	defaultPoolSize := d.Get("default_pool_size").(int)
+	privateEndpointEnabled := d.Get("private_service_endpoint_enabled").(bool)
+	publicEndpointEnabled := d.Get("public_service_endpoint_enabled").(bool)
 
 	//Read the hardware and convert it to appropriate
 	var isolation string
@@ -439,17 +455,19 @@ func resourceIBMContainerClusterCreate(d *schema.ResourceData, meta interface{})
 	}
 
 	params := v1.ClusterCreateRequest{
-		Name:           name,
-		Datacenter:     datacenter,
-		WorkerNum:      defaultPoolSize,
-		Billing:        billing,
-		MachineType:    machineType,
-		PublicVlan:     publicVlanID,
-		PrivateVlan:    privateVlanID,
-		NoSubnet:       noSubnet,
-		Isolation:      isolation,
-		DiskEncryption: diskEncryption,
-		EnableTrusted:  enableTrusted,
+		Name:                   name,
+		Datacenter:             datacenter,
+		WorkerNum:              defaultPoolSize,
+		Billing:                billing,
+		MachineType:            machineType,
+		PublicVlan:             publicVlanID,
+		PrivateVlan:            privateVlanID,
+		NoSubnet:               noSubnet,
+		Isolation:              isolation,
+		DiskEncryption:         diskEncryption,
+		EnableTrusted:          enableTrusted,
+		PublicEndpointEnabled:  publicEndpointEnabled,
+		PrivateEndpointEnabled: privateEndpointEnabled,
 	}
 
 	if v, ok := d.GetOk("kube_version"); ok {
