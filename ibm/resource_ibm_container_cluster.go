@@ -394,6 +394,28 @@ func resourceIBMContainerCluster() *schema.Resource {
 					},
 				},
 			},
+			"public_service_endpoint": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				ForceNew: true,
+				Computed: true,
+			},
+
+			"private_service_endpoint": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				ForceNew: true,
+				Computed: true,
+			},
+			"public_service_endpoint_url": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+
+			"private_service_endpoint_url": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
 		},
 	}
 }
@@ -414,6 +436,8 @@ func resourceIBMContainerClusterCreate(d *schema.ResourceData, meta interface{})
 	enableTrusted := d.Get("is_trusted").(bool)
 	diskEncryption := d.Get("disk_encryption").(bool)
 	defaultPoolSize := d.Get("default_pool_size").(int)
+	privateEndpointEnabled := d.Get("private_service_endpoint").(bool)
+	publicEndpointEnabled := d.Get("public_service_endpoint").(bool)
 
 	//Read the hardware and convert it to appropriate
 	var isolation string
@@ -439,21 +463,29 @@ func resourceIBMContainerClusterCreate(d *schema.ResourceData, meta interface{})
 	}
 
 	params := v1.ClusterCreateRequest{
-		Name:           name,
-		Datacenter:     datacenter,
-		WorkerNum:      defaultPoolSize,
-		Billing:        billing,
-		MachineType:    machineType,
-		PublicVlan:     publicVlanID,
-		PrivateVlan:    privateVlanID,
-		NoSubnet:       noSubnet,
-		Isolation:      isolation,
-		DiskEncryption: diskEncryption,
-		EnableTrusted:  enableTrusted,
+		Name:                   name,
+		Datacenter:             datacenter,
+		WorkerNum:              defaultPoolSize,
+		Billing:                billing,
+		MachineType:            machineType,
+		PublicVlan:             publicVlanID,
+		PrivateVlan:            privateVlanID,
+		NoSubnet:               noSubnet,
+		Isolation:              isolation,
+		DiskEncryption:         diskEncryption,
+		EnableTrusted:          enableTrusted,
+		PublicEndpointEnabled:  publicEndpointEnabled,
+		PrivateEndpointEnabled: privateEndpointEnabled,
 	}
 
 	if v, ok := d.GetOk("kube_version"); ok {
 		params.MasterVersion = v.(string)
+	}
+	if v, ok := d.GetOkExists("private_service_endpoint"); ok {
+		params.PrivateEndpointEnabled = v.(bool)
+	}
+	if v, ok := d.GetOkExists("public_service_endpoint"); ok {
+		params.PublicEndpointEnabled = v.(bool)
 	}
 
 	targetEnv, err := getClusterTargetHeader(d, meta)
@@ -570,6 +602,10 @@ func resourceIBMContainerClusterRead(d *schema.ResourceData, meta interface{}) e
 	d.Set("is_trusted", cls.IsTrusted)
 	d.Set("albs", flattenAlbs(albs))
 	d.Set("resource_group_id", cls.ResourceGroupID)
+	d.Set("public_service_endpoint", cls.PublicServiceEndpointEnabled)
+	d.Set("private_service_endpoint", cls.PrivateServiceEndpointEnabled)
+	d.Set("public_service_endpoint_url", cls.PublicServiceEndpointURL)
+	d.Set("private_service_endpoint_url", cls.PrivateServiceEndpointURL)
 
 	return nil
 }

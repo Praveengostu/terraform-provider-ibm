@@ -227,6 +227,24 @@ func dataSourceIBMContainerCluster() *schema.Resource {
 				Description: "ID of the resource group.",
 				Computed:    true,
 			},
+			"public_service_endpoint": {
+				Type:     schema.TypeBool,
+				Computed: true,
+			},
+
+			"private_service_endpoint": {
+				Type:     schema.TypeBool,
+				Computed: true,
+			},
+			"public_service_endpoint_url": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+
+			"private_service_endpoint_url": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
 		},
 	}
 }
@@ -292,6 +310,10 @@ func dataSourceIBMContainerClusterRead(d *schema.ResourceData, meta interface{})
 	d.Set("worker_pools", flattenWorkerPools(workerPools))
 	d.Set("albs", flattenAlbs(albs))
 	d.Set("resource_group_id", clusterFields.ResourceGroupID)
+	d.Set("public_service_endpoint", clusterFields.PublicServiceEndpointEnabled)
+	d.Set("private_service_endpoint", clusterFields.PrivateServiceEndpointEnabled)
+	d.Set("public_service_endpoint_url", clusterFields.PublicServiceEndpointURL)
+	d.Set("private_service_endpoint_url", clusterFields.PrivateServiceEndpointURL)
 
 	return nil
 }
